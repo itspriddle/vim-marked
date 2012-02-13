@@ -19,7 +19,7 @@ endfunction
 function s:QuitMarked()
   let pid = system('ps ax | grep "[M]arked" | awk "{print \$1}"')
   if ! empty(pid)
-    silent exe "!kill -TERM ".pid
+    silent exe "!kill -HUP ".pid
     redraw!
   endif
 endfunction
