@@ -17,7 +17,7 @@ function s:OpenMarked()
 endfunction
 
 function s:QuitMarked()
-  let pid = system('ps ax | grep "[M]arked" | awk "{print \$1}"')
+  let pid = system('ps ax | awk "/[M]arked/ {print \$1}"')
   if ! empty(pid)
     silent exe "!kill -HUP ".pid
     redraw!
