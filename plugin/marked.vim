@@ -24,13 +24,12 @@ function s:QuitMarked()
   endif
 endfunction
 
-command! MarkedOpen :call s:OpenMarked()
-command! MarkedQuit :call s:QuitMarked()
-
 if has('autocmd')
   augroup marked_autoclose
     autocmd!
     autocmd VimLeave * :call <SID>QuitMarked()
+    autocmd Filetype markdown command! -buffer MarkedOpen :call s:OpenMarked()
+    autocmd FileType markdown command! -buffer MarkedQuit :call s:QuitMarked()
   augroup END
 endif
 
