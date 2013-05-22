@@ -35,13 +35,11 @@ function s:QuitMarked(path)
   redraw!
 endfunction
 
-if has('autocmd')
-  augroup marked_commands
-    autocmd!
-    autocmd Filetype markdown command! -buffer MarkedOpen :call s:OpenMarked()
-    autocmd FileType markdown command! -buffer MarkedQuit :call s:QuitMarked(expand('%:p'))
-  augroup END
-endif
+augroup marked_commands
+  autocmd!
+  autocmd Filetype markdown command! -buffer MarkedOpen :call s:OpenMarked()
+  autocmd FileType markdown command! -buffer MarkedQuit :call s:QuitMarked(expand('%:p'))
+augroup END
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
