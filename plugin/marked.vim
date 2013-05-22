@@ -13,13 +13,19 @@ set cpo&vim
 
 function s:OpenMarked()
   silent exe "!open -a Marked.app '%:p'"
-  augroup marked_autocloser
+  silent exe "augroup marked_autoclose_".expand("%:p")
+    autocmd!
     silent exe 'autocmd VimLeavePre * call s:QuitMarked("'.expand("%:p").'")'
   augroup END
   redraw!
 endfunction
 
 function s:QuitMarked(path)
+  silent exe "augroup marked_autoclose_".a:path
+    autocmd!
+  augroup END
+  silent exe "augroup! marked_autoclose_".a:path
+
   let cmd  = " -e 'try'"
   let cmd .= " -e 'if application \"Marked\" is running then'"
   let cmd .= " -e 'tell application \"Marked\"'"
