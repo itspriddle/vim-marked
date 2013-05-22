@@ -1,7 +1,7 @@
 " marked.vim
 " Author:  Joshua Priddle <jpriddle@me.com>
 " URL:     https://github.com/itspriddle/vim-marked
-" Version: 0.2.0
+" Version: 0.2.1
 " License: Same as Vim itself (see :help license)
 
 if &cp || exists("g:marked_loaded") && g:marked_loaded
