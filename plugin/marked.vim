@@ -1,7 +1,7 @@
 " marked.vim
 " Author:  Joshua Priddle <jpriddle@me.com>
 " URL:     https://github.com/itspriddle/vim-marked
-" Version: 0.1.0
+" Version: 0.2.0
 " License: Same as Vim itself (see :help license)
 
 if &cp || exists("g:marked_loaded") && g:marked_loaded
@@ -13,26 +13,33 @@ set cpo&vim
 
 function s:OpenMarked()
   silent exe "!open -a Marked.app '%:p'"
+  augroup marked_autocloser
+    silent exe 'autocmd VimLeavePre * call s:QuitMarked("'.expand("%:p").'")'
+  augroup END
   redraw!
 endfunction
 
-function s:QuitMarked()
-  let pid = system('ps ax | grep "[M]arked" | awk "{print \$1}"')
-  if ! empty(pid)
-    silent exe "!kill -HUP ".pid
-    redraw!
-  endif
+function s:QuitMarked(path)
+  let cmd  = " -e 'try'"
+  let cmd .= " -e 'if application \"Marked\" is running then'"
+  let cmd .= " -e 'tell application \"Marked\"'"
+  let cmd .= " -e 'close (first document whose path is equal to \"".a:path."\")'"
+  let cmd .= " -e 'if count of every window is equal to 0 then'"
+  let cmd .= " -e 'quit'"
+  let cmd .= " -e 'end if'"
+  let cmd .= " -e 'end tell'"
+  let cmd .= " -e 'end if'"
+  let cmd .= " -e 'end try'"
+
+  silent exe "!osascript ".cmd
+  redraw!
 endfunction
 
-command! MarkedOpen :call s:OpenMarked()
-command! MarkedQuit :call s:QuitMarked()
-
-if has('autocmd')
-  augroup marked_autoclose
-    autocmd!
-    autocmd VimLeave * :call <SID>QuitMarked()
-  augroup END
-endif
+augroup marked_commands
+  autocmd!
+  autocmd Filetype markdown command! -buffer MarkedOpen :call s:OpenMarked()
+  autocmd FileType markdown command! -buffer MarkedQuit :call s:QuitMarked(expand('%:p'))
+augroup END
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

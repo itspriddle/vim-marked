@@ -1,12 +1,19 @@
 # marked.vim
 
-Open the current buffer in [Marked.app](http://markedapp.com/).
+Open the current Markdown buffer in [Marked.app](http://markedapp.com/).
 
-## Commands
+## Usage
 
-    :MarkedOpen    Open the current buffer in Marked
+This plugin adds the following commands to Markdown buffers:
 
-    :MarkedQuit    Quit Marked
+    :MarkedOpen    Open the current Markdown buffer in Marked.app.
+
+    :MarkedQuit    Close the current Markdown buffer in Marked.app.
+                   Quit Marked.app if no other documents are open.
+
+If you run `:MarkedOpen`, the document in Marked.app will be automatically
+closed when Vim exists, and Marked.app will quit if no other documents are
+open.
 
 ## License
 
