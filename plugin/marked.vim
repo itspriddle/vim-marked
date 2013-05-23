@@ -11,8 +11,9 @@ let g:marked_loaded = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
-function s:OpenMarked()
-  silent exe "!open -a Marked.app '%:p'"
+function s:OpenMarked(background)
+  silent exe "!open -a Marked.app ".(a:background ? '-g' : '')." '%:p'"
+
   silent exe "augroup marked_autoclose_".expand("%:p")
     autocmd!
     silent exe 'autocmd VimLeavePre * call s:QuitMarked("'.expand("%:p").'")'
@@ -43,7 +44,7 @@ endfunction
 
 augroup marked_commands
   autocmd!
-  autocmd Filetype markdown command! -buffer MarkedOpen :call s:OpenMarked()
+  autocmd FileType markdown command! -buffer -bang MarkedOpen :call s:OpenMarked(<bang>0)
   autocmd FileType markdown command! -buffer MarkedQuit :call s:QuitMarked(expand('%:p'))
 augroup END
 
