@@ -6,7 +6,9 @@ Open the current Markdown buffer in [Marked.app](http://markedapp.com/).
 
 This plugin adds the following commands to Markdown buffers:
 
-    :MarkedOpen    Open the current Markdown buffer in Marked.app.
+    :MarkedOpen[!] Open the current Markdown buffer in Marked.app.
+                   Call with a bang to prevent Marked.app from stealing
+                   focus from Vim.
 
     :MarkedQuit    Close the current Markdown buffer in Marked.app.
                    Quit Marked.app if no other documents are open.
