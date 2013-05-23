@@ -12,7 +12,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 function s:OpenMarked()
-  silent exe "!open -a Marked.app '%:p'"
+  silent exe "!open -a Marked.app -g '%:p'"
   silent exe "augroup marked_autoclose_".expand("%:p")
     autocmd!
     silent exe 'autocmd VimLeavePre * call s:QuitMarked("'.expand("%:p").'")'
