@@ -46,6 +46,8 @@ augroup marked_commands
   autocmd!
   autocmd FileType markdown command! -buffer -bang MarkedOpen :call s:OpenMarked(<bang>0)
   autocmd FileType markdown command! -buffer MarkedQuit :call s:QuitMarked(expand('%:p'))
+  autocmd FileType mkd command! -buffer -bang MarkedOpen :call s:OpenMarked(<bang>0)
+  autocmd FileType mkd command! -buffer MarkedQuit :call s:QuitMarked(expand('%:p'))
 augroup END
 
 let &cpo = s:save_cpo
