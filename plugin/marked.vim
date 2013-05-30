@@ -1,7 +1,7 @@
 " marked.vim
 " Author:  Joshua Priddle <jpriddle@me.com>
 " URL:     https://github.com/itspriddle/vim-marked
-" Version: 0.3.0
+" Version: 0.2.1
 " License: Same as Vim itself (see :help license)
 
 if &cp || exists("g:marked_loaded") && g:marked_loaded
@@ -12,11 +12,12 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 function s:OpenMarked(background)
-  silent exe "!open -a Marked.app ".(a:background ? '-g' : '')." '%:p'"
+  let l:filename = expand("%:p")
+  silent exe "!open -a Marked.app ".(a:background ? '-g' : '')." '".l:filename."'"
 
-  silent exe "augroup marked_autoclose_".expand("%:p")
+  silent exe "augroup marked_autoclose_".l:filename
     autocmd!
-    silent exe 'autocmd VimLeavePre * call s:QuitMarked("'.expand("%:p").'")'
+    silent exe 'autocmd VimLeavePre * call s:QuitMarked("'.l:filename.'")'
   augroup END
   redraw!
 endfunction
