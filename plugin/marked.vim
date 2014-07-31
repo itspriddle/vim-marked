@@ -13,7 +13,7 @@ set cpo&vim
 
 function s:OpenMarked(background)
   let l:filename = expand("%:p")
-  silent exe "!open -a Marked.app ".(a:background ? '-g' : '')." '".l:filename."'"
+  silent exe "!open -a 'Marked 2.app' ".(a:background ? '-g' : '')." '".l:filename."'"
 
   silent exe "augroup marked_autoclose_".l:filename
     autocmd!
@@ -29,8 +29,8 @@ function s:QuitMarked(path)
   silent exe "augroup! marked_autoclose_".a:path
 
   let cmd  = " -e 'try'"
-  let cmd .= " -e 'if application \"Marked\" is running then'"
-  let cmd .= " -e 'tell application \"Marked\"'"
+  let cmd .= " -e 'if application \"Marked 2\" is running then'"
+  let cmd .= " -e 'tell application \"Marked 2\"'"
   let cmd .= " -e 'close (first document whose path is equal to \"".a:path."\")'"
   let cmd .= " -e 'if count of every window is equal to 0 then'"
   let cmd .= " -e 'quit'"
