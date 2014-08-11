@@ -13,23 +13,20 @@ set cpo&vim
 
 let g:marked_app = get(g:, "marked_app", "Marked 2")
 
+let s:open_documents = []
+
 function s:OpenMarked(background)
   let l:filename = expand("%:p")
-  silent exe "!open -a '".g:marked_app."' ".(a:background ? '-g' : '')." '".l:filename."'"
 
-  silent exe "augroup marked_autoclose_".l:filename
-    autocmd!
-    silent exe 'autocmd VimLeavePre * call s:QuitMarked("'.l:filename.'")'
-  augroup END
+  if index(s:open_documents, l:filename) < 0
+    call add(s:open_documents, l:filename)
+  endif
+
+  silent exe "!open -a '".g:marked_app."' ".(a:background ? '-g' : '')." '".l:filename."'"
   redraw!
 endfunction
 
 function s:QuitMarked(path)
-  silent exe "augroup marked_autoclose_".a:path
-    autocmd!
-  augroup END
-  silent exe "augroup! marked_autoclose_".a:path
-
   let cmd  = " -e 'try'"
   let cmd .= " -e 'if application \"".g:marked_app."\" is running then'"
   let cmd .= " -e 'tell application \"".g:marked_app."\"'"
@@ -45,10 +42,17 @@ function s:QuitMarked(path)
   redraw!
 endfunction
 
+function s:QuitAll()
+  for document in s:open_documents
+    call s:QuitMarked(document)
+  endfor
+endfunction
+
 augroup marked_commands
   autocmd!
   autocmd FileType markdown,mkd command! -buffer -bang MarkedOpen :call s:OpenMarked(<bang>0)
   autocmd FileType markdown,mkd command! -buffer MarkedQuit :call s:QuitMarked(expand('%:p'))
+  autocmd VimLeavePre * call s:QuitAll()
 augroup END
 
 let &cpo = s:save_cpo
