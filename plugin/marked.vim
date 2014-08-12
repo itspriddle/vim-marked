@@ -22,15 +22,17 @@ function s:OpenMarked(background)
     call add(s:open_documents, l:filename)
   endif
 
-  silent exe "!open -a '".g:marked_app."' ".(a:background ? '-g' : '')." '".l:filename."'"
+  silent exe "!open -a '".g:marked_app."' ".(a:background ? '-g' : '')." ".shellescape(l:filename)
   redraw!
 endfunction
 
 function s:QuitMarked(path)
+  let path = substitute(escape(a:path, '"\'), "'", "'\\\\''", "")
+
   let cmd  = " -e 'try'"
   let cmd .= " -e 'if application \"".g:marked_app."\" is running then'"
   let cmd .= " -e 'tell application \"".g:marked_app."\"'"
-  let cmd .= " -e 'close (first document whose path is equal to \"".a:path."\")'"
+  let cmd .= " -e 'close (first document whose path is equal to \"".path."\")'"
   let cmd .= " -e 'if count of documents is equal to 0 then'"
   let cmd .= " -e 'quit'"
   let cmd .= " -e 'end if'"
