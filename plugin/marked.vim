@@ -50,8 +50,8 @@ endfunction
 
 augroup marked_commands
   autocmd!
-  autocmd FileType markdown,mkd command! -buffer -bang MarkedOpen :call s:OpenMarked(<bang>0)
-  autocmd FileType markdown,mkd command! -buffer MarkedQuit :call s:QuitMarked(expand('%:p'))
+  autocmd FileType markdown,mkd,ghmarkdown command! -buffer -bang MarkedOpen :call s:OpenMarked(<bang>0)
+  autocmd FileType markdown,mkd,ghmarkdown command! -buffer MarkedQuit :call s:QuitMarked(expand('%:p'))
   autocmd VimLeavePre * call s:QuitAll()
 augroup END
 
