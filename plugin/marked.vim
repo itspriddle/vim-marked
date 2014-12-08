@@ -4,6 +4,11 @@
 " Version: 0.5.0
 " License: Same as Vim itself (see :help license)
 
+" Don't do anything if we're not on OSX.
+if !has('unix') || !(system('uname -s') == "Darwin\n")
+  finish
+endif
+
 if &cp || exists("g:marked_loaded") && g:marked_loaded
   finish
 endif

@@ -17,6 +17,9 @@ This plugin adds the following commands to Markdown buffers:
 If you run `:MarkedOpen`, the document in Marked will be automatically closed
 when Vim exists, and Marked will quit if no other documents are open.
 
+**Note** if you're not on OSX, the plugin won't be loaded and the `:MarkedOpen`
+and `:MarkedQuit` commands won't be available.
+
 ## Configuration
 
 By default, this plugin is configred to use Marked 2. If you are still using
