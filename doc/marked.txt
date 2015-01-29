@@ -1,0 +1,43 @@
+*marked.vim*  Open the current Markdown buffer in Marked.app.
+
+Author: Joshua Priddle <jpriddle@me.com>
+License: Same terms as Vim itself (see |license|)
+
+==============================================================================
+INTRODUCTION                                    *marked*
+
+marked.vim adds `:MarkedOpen` and `:MarkedQuit` commands to Markdown buffers.
+
+Note: Since Marked is available only for OS X, this plugin will not be loaded
+unless you are on OS X.
+
+==============================================================================
+CONFIGURATION                                   *marked-configuration*
+
+                                                *g:marked_app*
+The Marked application name. By default this is "Marked 2". If you are still
+using Marked.app version 1, add the following to your |vimrc|: >
+    let g:marked_app = 'Marked'
+<
+==============================================================================
+COMMANDS                                        *marked-commands*
+
+                                                *marked-:MarkedOpen*
+:MarkedOpen[!]          Open the current Markdown buffer in Marked. Call with
+                        a bang to prevent Marked from stealing focus from Vim.
+                        Documents opened in Marked are tracked and closed
+                        automatically when you quit Vim.
+
+                                                *marked-:MarkedQuit*
+:MarkedQuit             Close the current Markdown buffer in Marked. Quits
+                        Marked if there are no other documents open.
+
+==============================================================================
+ABOUT                                           *marked-about*
+
+Grab the latest version or report a bug on Github:
+
+https://github.com/itspriddle/vim-marked
+
+==============================================================================
+ vim:tw=78:et:ft=help:norl:
