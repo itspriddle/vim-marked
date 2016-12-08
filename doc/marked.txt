@@ -6,7 +6,8 @@ License: Same terms as Vim itself (see |license|)
 ==============================================================================
 INTRODUCTION                                    *marked*
 
-marked.vim adds `:MarkedOpen` and `:MarkedQuit` commands to Markdown buffers.
+marked.vim adds `:MarkedOpen`, `:MarkedQuit` and `:MarkedToggle` commands to
+Markdown buffers.
 
 Note: Since Marked is available only for OS X, this plugin will not be loaded
 unless you are on OS X.
@@ -31,6 +32,12 @@ COMMANDS                                        *marked-commands*
                                                 *marked-:MarkedQuit*
 :MarkedQuit             Close the current Markdown buffer in Marked. Quits
                         Marked if there are no other documents open.
+
+                                                *marked-:MarkedToggle*
+:MarkedToggle[!]        If the current Markdown buffer is already open in
+                        Marked, same as :MarkedQuit. If not, same as
+                        :MarkedOpen[!].
+
 
 ==============================================================================
 ABOUT                                           *marked-about*
