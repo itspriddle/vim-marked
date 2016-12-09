@@ -47,6 +47,14 @@ function s:QuitMarked(path)
   redraw!
 endfunction
 
+function s:ToggleMarked(background, path)
+  if index(s:open_documents, a:path) < 0
+    call s:OpenMarked(a:background)
+  else
+    call s:QuitMarked(a:path)
+  endif
+endfunction
+
 function s:QuitAll()
   for document in s:open_documents
     call s:QuitMarked(document)
@@ -57,6 +65,7 @@ augroup marked_commands
   autocmd!
   autocmd FileType markdown,mkd,ghmarkdown command! -buffer -bang MarkedOpen :call s:OpenMarked(<bang>0)
   autocmd FileType markdown,mkd,ghmarkdown command! -buffer MarkedQuit :call s:QuitMarked(expand('%:p'))
+  autocmd FileType markdown,mkd,ghmarkdown command! -buffer -bang MarkedToggle :call s:ToggleMarked(<bang>0, expand('%:p'))
   autocmd VimLeavePre * call s:QuitAll()
 augroup END
 

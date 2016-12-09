@@ -25,6 +25,10 @@ This plugin adds the following commands to Markdown buffers:
     :MarkedQuit             Close the current Markdown buffer in Marked. Quits
                             Marked if there are no other documents open.
 
+    :MarkedToggle[!]        If the current Markdown buffer is already open in
+                            Marked, calls :MarkedQuit. If not, calls
+                            :MarkedOpen[!].
+
 ## License
 
 Same as Vim itself, see `:help license`.
