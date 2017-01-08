@@ -18,6 +18,19 @@ set cpo&vim
 
 let g:marked_app = get(g:, "marked_app", "Marked 2")
 
+let s:app_found = 0
+
+for app in [expand("~/Applications/"), "/Applications/"]
+  if isdirectory(app.g:marked_app.".app")
+    let s:app_found = 1
+    break
+  endif
+endfor
+
+if ! s:app_found
+  finish
+endif
+
 let s:open_documents = []
 
 function s:OpenMarked(background)
