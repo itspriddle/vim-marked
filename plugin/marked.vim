@@ -17,6 +17,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 let g:marked_app = get(g:, "marked_app", "Marked 2")
+let g:marked_filetypes = get(g:, "marked_filetypes", ["markdown", "mkd", "ghmarkdown", "vimwiki"])
 
 let s:open_documents = []
 
@@ -61,13 +62,19 @@ function s:QuitAll()
   endfor
 endfunction
 
-augroup marked_commands
-  autocmd!
-  autocmd FileType markdown,mkd,ghmarkdown,vimwiki command! -buffer -bang MarkedOpen :call s:OpenMarked(<bang>0)
-  autocmd FileType markdown,mkd,ghmarkdown,vimwiki command! -buffer MarkedQuit :call s:QuitMarked(expand('%:p'))
-  autocmd FileType markdown,mkd,ghmarkdown,vimwiki command! -buffer -bang MarkedToggle :call s:ToggleMarked(<bang>0, expand('%:p'))
-  autocmd VimLeavePre * call s:QuitAll()
-augroup END
+function! s:RegisterCommands()
+  command! -buffer -bang MarkedOpen   call s:OpenMarked(<bang>0)
+  command! -buffer       MarkedQuit   call s:QuitMarked(expand('%:p'))
+  command! -buffer -bang MarkedToggle call s:ToggleMarked(<bang>0, expand('%:p'))
+endfunction
+
+if len(g:marked_filetypes) > 0
+  augroup marked_commands
+    autocmd!
+    autocmd VimLeavePre * call s:QuitAll()
+    execute "autocmd FileType ".join(g:marked_filetypes, ",")." call <SID>RegisterCommands()"
+  augroup END
+endif
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

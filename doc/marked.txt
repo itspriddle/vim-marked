@@ -20,6 +20,11 @@ The Marked application name. By default this is "Marked 2". If you are still
 using Marked.app version 1, add the following to your |vimrc|: >
     let g:marked_app = 'Marked'
 <
+                                                *g:marked_filetypes*
+Vim FileTypes that can be opened by Marked. If you need to customize, update
+the list in your |vimrc|: >
+    let g:marked_filetypes = ["markdown", "mkd", "ghmarkdown", "vimwiki"]
+<
 ==============================================================================
 COMMANDS                                        *marked-commands*
 
