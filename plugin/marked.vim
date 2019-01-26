@@ -77,6 +77,9 @@ function! s:RegisterCommands()
   command! -buffer -bang MarkedOpen   call s:OpenMarked(<bang>0)
   command! -buffer       MarkedQuit   call s:QuitMarked(expand('%:p'))
   command! -buffer -bang MarkedToggle call s:ToggleMarked(<bang>0, expand('%:p'))
+
+  let b:undo_ftplugin = get(b:, "undo_ftplugin", "exe") .
+    \ "| delc MarkedOpen | delc MarkedQuit | delc MarkedToggle"
 endfunction
 
 if len(g:marked_filetypes) > 0
