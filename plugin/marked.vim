@@ -21,18 +21,32 @@ let g:marked_filetypes = get(g:, "marked_filetypes", ["markdown", "mkd", "ghmark
 
 let s:open_documents = []
 
+function! s:AddDocument(path)
+  if index(s:open_documents, a:path) < 0
+    call add(s:open_documents, a:path)
+  endif
+endfunction
+
+function! s:RemoveDocument(path)
+  let index = index(s:open_documents, a:path)
+
+  if index >= 0
+    unlet s:open_documents[index]
+  endif
+endfunction
+
 function s:OpenMarked(background)
   let l:filename = expand("%:p")
 
-  if index(s:open_documents, l:filename) < 0
-    call add(s:open_documents, l:filename)
-  endif
+  call s:AddDocument(l:filename)
 
   silent exe "!open -a '".g:marked_app."' ".(a:background ? '-g' : '')." '".l:filename."'"
   redraw!
 endfunction
 
 function s:QuitMarked(path)
+  call s:RemoveDocument(a:path)
+
   let cmd  = " -e 'try'"
   let cmd .= " -e 'if application \"".g:marked_app."\" is running then'"
   let cmd .= " -e 'tell application \"".g:marked_app."\"'"
