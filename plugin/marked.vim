@@ -5,13 +5,10 @@
 " License: Same as Vim itself (see :help license)
 
 " Don't do anything if we're not on OS X.
-if !has('unix') || system('uname -s') != "Darwin\n"
+if &cp || (exists("g:marked_loaded") && g:marked_loaded) || !has('unix') || system('uname -s') != "Darwin\n"
   finish
 endif
 
-if &cp || exists("g:marked_loaded") && g:marked_loaded
-  finish
-endif
 let g:marked_loaded = 1
 let s:save_cpo = &cpo
 set cpo&vim
@@ -35,7 +32,7 @@ function! s:RemoveDocument(path)
   endif
 endfunction
 
-function s:OpenMarked(background)
+function! s:OpenMarked(background)
   let l:filename = expand("%:p")
 
   call s:AddDocument(l:filename)
@@ -44,7 +41,7 @@ function s:OpenMarked(background)
   redraw!
 endfunction
 
-function s:QuitMarked(path)
+function! s:QuitMarked(path)
   call s:RemoveDocument(a:path)
 
   let cmd  = " -e 'try'"
@@ -62,7 +59,7 @@ function s:QuitMarked(path)
   redraw!
 endfunction
 
-function s:ToggleMarked(background, path)
+function! s:ToggleMarked(background, path)
   if index(s:open_documents, a:path) < 0
     call s:OpenMarked(a:background)
   else
@@ -70,7 +67,7 @@ function s:ToggleMarked(background, path)
   endif
 endfunction
 
-function s:QuitAll()
+function! s:QuitAll()
   for document in s:open_documents
     call s:QuitMarked(document)
   endfor
