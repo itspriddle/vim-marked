@@ -13,6 +13,10 @@ Marked version 1, set the following in your `~/.vimrc`:
 
     let g:marked_app = "Marked"
 
+If you need to enable the plugin for custom Vim FileTypes:
+
+    let g:marked_filetypes = ["markdown", "mkd", "ghmarkdown", "vimwiki"]
+
 ## Usage
 
 This plugin adds the following commands to Markdown buffers:
