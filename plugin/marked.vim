@@ -48,6 +48,12 @@ function! s:MarkedQuit(force, path) abort
   execute printf("silent !osascript %s %s %s", applescript, a:force, shellescape(a:path, 1))
 endfunction
 
+function! s:MarkedQuitVimLeave() abort
+  if get(g:, "marked_autoquit", 1)
+    call s:MarkedQuit(1, "")
+  endif
+endfunction
+
 function! s:MarkedToggle(background_or_force_quit, path) abort
   if s:is_document_open(a:path)
     call s:MarkedQuit(a:background_or_force_quit, a:path)
@@ -106,7 +112,7 @@ endfunction
 augroup marked_commands
   autocmd!
   autocmd FileType    * call s:init(expand("<amatch>"))
-  autocmd VimLeavePre * call s:MarkedQuit(1, "")
+  autocmd VimLeavePre * call s:MarkedQuitVimLeave()
 augroup END
 
 let &cpo = s:save_cpo
