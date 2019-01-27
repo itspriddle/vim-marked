@@ -6,8 +6,9 @@ License: Same terms as Vim itself (see |license|)
 ==============================================================================
 INTRODUCTION                                    *marked*
 
-marked.vim adds `:MarkedOpen`, `:MarkedQuit` and `:MarkedToggle` commands to
-Markdown buffers.
+marked.vim adds `:MarkedOpen`, `:MarkedQuit`, `:MarkedToggle`, and
+`:MarkedPreview` commands to Markdown buffers, allowing you to quickly open,
+close, and preview content in Marked 2.
 
 Note: Since Marked is available only for OS X, this plugin will not be loaded
 unless you are on OS X.
@@ -15,11 +16,6 @@ unless you are on OS X.
 ==============================================================================
 CONFIGURATION                                   *marked-configuration*
 
-                                                *g:marked_app*
-The Marked application name. By default this is "Marked 2". If you are still
-using Marked.app version 1, add the following to your |vimrc|: >
-    let g:marked_app = 'Marked'
-<
                                                 *g:marked_filetypes*
 Vim FileTypes that can be opened by Marked. If you need to customize, update
 the list in your |vimrc|: >
@@ -43,6 +39,9 @@ COMMANDS                                        *marked-commands*
                         Marked, same as :MarkedQuit. If not, same as
                         :MarkedOpen[!].
 
+                                                *marked-:MarkedPreview*
+:MarkedPreview[!]       Send the current rand (defaults to the enture buffer)
+                        to Marked as a preview.
 
 ==============================================================================
 ABOUT                                           *marked-about*

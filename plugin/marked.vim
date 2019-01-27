@@ -1,11 +1,10 @@
 " marked.vim
 " Author:  Joshua Priddle <jpriddle@me.com>
 " URL:     https://github.com/itspriddle/vim-marked
-" Version: 1.0.0
+" Version: 2.0.0-beta
 " License: Same as Vim itself (see :help license)
 
-" Don't do anything if we're not on OS X.
-if &cp || (exists("g:marked_loaded") && g:marked_loaded) || !has('unix') || system('uname -s') != "Darwin\n"
+if &cp || (exists("g:marked_loaded") && g:marked_loaded) || !has("macunix") || !executable("osascript")
   finish
 endif
 
@@ -13,81 +12,101 @@ let g:marked_loaded = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
-let g:marked_app = get(g:, "marked_app", "Marked 2")
 let g:marked_filetypes = get(g:, "marked_filetypes", ["markdown", "mkd", "ghmarkdown", "vimwiki"])
 
-let s:open_documents = []
+function! s:marked_open_uri(background, command, args) abort
+  let uri = "x-marked://" . a:command
 
-function! s:AddDocument(path)
-  if index(s:open_documents, a:path) < 0
-    call add(s:open_documents, a:path)
+  if !empty(a:args)
+    let uri .= "?" . join(map(items(a:args), 'printf("%s=%s", v:val[0], s:url_encode(v:val[1]))'), "&")
   endif
+
+  execute printf("silent !open %s %s", (a:background ? "-g" : ""), shellescape(uri, 1))
 endfunction
 
-function! s:RemoveDocument(path)
-  let index = index(s:open_documents, a:path)
-
-  if index >= 0
-    unlet s:open_documents[index]
-  endif
+function! s:MarkedOpen(background, path) abort
+  call s:marked_open_uri(a:background, "open", { "file": a:path })
 endfunction
 
-function! s:OpenMarked(background)
-  let l:filename = expand("%:p")
+function! s:MarkedQuit(force, path) abort
+  let applescript = s:applescript([
+    \ 'on run argv',
+    \ '  if application "Marked 2" is running then',
+    \ '    tell application "Marked 2"',
+    \ '      if (item 1 of argv as string) is equal to "1" then',
+    \ '        quit',
+    \ '      else',
+    \ '        try',
+    \ '          close (first document whose path is equal to (item 2 of argv as string))',
+    \ '        end try',
+    \ '      end if',
+    \ '    end tell',
+    \ '  end if',
+    \ 'end run',
+    \ ])
 
-  call s:AddDocument(l:filename)
-
-  silent exe "!open -a '".g:marked_app."' ".(a:background ? '-g' : '')." '".l:filename."'"
-  redraw!
+  execute printf("silent !osascript %s %s %s", applescript, a:force, shellescape(a:path, 1))
 endfunction
 
-function! s:QuitMarked(path)
-  call s:RemoveDocument(a:path)
-
-  let cmd  = " -e 'try'"
-  let cmd .= " -e 'if application \"".g:marked_app."\" is running then'"
-  let cmd .= " -e 'tell application \"".g:marked_app."\"'"
-  let cmd .= " -e 'close (first document whose path is equal to \"".a:path."\")'"
-  let cmd .= " -e 'if count of documents is equal to 0 then'"
-  let cmd .= " -e 'quit'"
-  let cmd .= " -e 'end if'"
-  let cmd .= " -e 'end tell'"
-  let cmd .= " -e 'end if'"
-  let cmd .= " -e 'end try'"
-
-  silent exe "!osascript ".cmd
-  redraw!
-endfunction
-
-function! s:ToggleMarked(background, path)
-  if index(s:open_documents, a:path) < 0
-    call s:OpenMarked(a:background)
+function! s:MarkedToggle(background_or_force_quit, path) abort
+  if s:is_document_open(a:path)
+    call s:MarkedQuit(a:background_or_force_quit, a:path)
   else
-    call s:QuitMarked(a:path)
+    call s:MarkedOpen(a:background_or_force_quit, a:path)
   endif
 endfunction
 
-function! s:QuitAll()
-  for document in s:open_documents
-    call s:QuitMarked(document)
-  endfor
+function! s:MarkedPreview(line1, line2) abort
+  let text = join(getline(a:line1, a:line2), "\n")
+
+  call s:marked_open_uri(0, "preview", { "text": text })
 endfunction
 
-function! s:RegisterCommands(filetype) abort
+function! s:is_document_open(path) abort
+  let applescript = s:applescript([
+    \ 'on run argv',
+    \ '  if application "Marked 2" is running then',
+    \ '    tell application "Marked 2"',
+    \ '      set docs to path of every document',
+    \ '      if docs contains (item 1 of argv as string) then',
+    \ '        "1"',
+    \ '      end if',
+    \ '    end tell',
+    \ '  end if',
+    \ 'end run',
+    \ ])
+
+  let cmd = printf("osascript %s %s", applescript, shellescape(a:path, 1))
+
+  return trim(system(cmd)) == "1"
+endfunction
+
+function! s:init(filetype) abort
   if index(g:marked_filetypes, a:filetype) >= 0
-    command! -buffer -bang MarkedOpen   call s:OpenMarked(<bang>0)
-    command! -buffer       MarkedQuit   call s:QuitMarked(expand('%:p'))
-    command! -buffer -bang MarkedToggle call s:ToggleMarked(<bang>0, expand('%:p'))
+    command! -buffer -bang    MarkedOpen    call s:MarkedOpen(<bang>0, expand("%:p"))
+    command! -buffer -bang    MarkedQuit    call s:MarkedQuit(<bang>0, expand("%:p"))
+    command! -buffer -bang    MarkedToggle  call s:MarkedToggle(<bang>0, expand("%:p"))
+    command! -buffer -range=% MarkedPreview call s:MarkedPreview(<line1>, <line2>)
 
     let b:undo_ftplugin = get(b:, "undo_ftplugin", "exe") .
-      \ "| delc MarkedOpen | delc MarkedQuit | delc MarkedToggle"
+      \ "| delc MarkedOpen | delc MarkedQuit | delc MarkedToggle | delc MarkedPreview"
   endif
+endfunction
+
+" From the legend
+" https://github.com/tpope/vim-unimpaired/blob/5694455/plugin/unimpaired.vim#L369-L372
+function! s:url_encode(str) abort
+  return substitute(iconv(a:str, "latin1", "utf-8"), "[^A-Za-z0-9_.~-]", '\="%".printf("%02X", char2nr(submatch(0)))', "g")
+endfunction
+
+function! s:applescript(lines) abort
+  return join(map(a:lines, "'-e ' . shellescape(v:val, 1)"), " ")
 endfunction
 
 augroup marked_commands
   autocmd!
-  autocmd VimLeavePre * call s:QuitAll()
-  autocmd FileType * call s:RegisterCommands(expand("<amatch>"))
+  autocmd FileType    * call s:init(expand("<amatch>"))
+  autocmd VimLeavePre * call s:MarkedQuit(1, "")
 augroup END
 
 let &cpo = s:save_cpo
