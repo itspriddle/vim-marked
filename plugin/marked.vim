@@ -73,22 +73,22 @@ function! s:QuitAll()
   endfor
 endfunction
 
-function! s:RegisterCommands()
-  command! -buffer -bang MarkedOpen   call s:OpenMarked(<bang>0)
-  command! -buffer       MarkedQuit   call s:QuitMarked(expand('%:p'))
-  command! -buffer -bang MarkedToggle call s:ToggleMarked(<bang>0, expand('%:p'))
+function! s:RegisterCommands(filetype) abort
+  if index(g:marked_filetypes, a:filetype) >= 0
+    command! -buffer -bang MarkedOpen   call s:OpenMarked(<bang>0)
+    command! -buffer       MarkedQuit   call s:QuitMarked(expand('%:p'))
+    command! -buffer -bang MarkedToggle call s:ToggleMarked(<bang>0, expand('%:p'))
 
-  let b:undo_ftplugin = get(b:, "undo_ftplugin", "exe") .
-    \ "| delc MarkedOpen | delc MarkedQuit | delc MarkedToggle"
+    let b:undo_ftplugin = get(b:, "undo_ftplugin", "exe") .
+      \ "| delc MarkedOpen | delc MarkedQuit | delc MarkedToggle"
+  endif
 endfunction
 
-if len(g:marked_filetypes) > 0
-  augroup marked_commands
-    autocmd!
-    autocmd VimLeavePre * call s:QuitAll()
-    execute "autocmd FileType ".join(g:marked_filetypes, ",")." call <SID>RegisterCommands()"
-  augroup END
-endif
+augroup marked_commands
+  autocmd!
+  autocmd VimLeavePre * call s:QuitAll()
+  autocmd FileType * call s:RegisterCommands(expand("<amatch>"))
+augroup END
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
