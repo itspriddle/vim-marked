@@ -1,7 +1,7 @@
 " marked.vim
 " Author:  Joshua Priddle <jpriddle@me.com>
 " URL:     https://github.com/itspriddle/vim-marked
-" Version: 0.6.0
+" Version: 1.0.0
 " License: Same as Vim itself (see :help license)
 
 " Don't do anything if we're not on OS X.
