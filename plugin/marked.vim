@@ -12,6 +12,8 @@ let g:marked_loaded = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
+let s:opened_marked = 0
+
 let g:marked_filetypes = get(g:, "marked_filetypes", ["markdown", "mkd", "ghmarkdown", "vimwiki"])
 
 function! s:marked_open_uri(background, command, args) abort
@@ -22,6 +24,8 @@ function! s:marked_open_uri(background, command, args) abort
   endif
 
   execute printf("silent !open %s %s", (a:background ? "-g" : ""), shellescape(uri, 1))
+
+  let s:opened_marked = 1
 endfunction
 
 function! s:MarkedOpen(background, path) abort
@@ -29,27 +33,23 @@ function! s:MarkedOpen(background, path) abort
 endfunction
 
 function! s:MarkedQuit(force, path) abort
-  let applescript = s:applescript([
-    \ 'on run argv',
-    \ '  if application "Marked 2" is running then',
-    \ '    tell application "Marked 2"',
-    \ '      if (item 1 of argv as string) is equal to "1" then',
-    \ '        quit',
-    \ '      else',
-    \ '        try',
-    \ '          close (first document whose path is equal to (item 2 of argv as string))',
-    \ '        end try',
-    \ '      end if',
-    \ '    end tell',
-    \ '  end if',
-    \ 'end run',
-    \ ])
+  if a:force
+    execute printf("silent !osascript %s", s:applescript(["quit"]))
 
-  execute printf("silent !osascript %s %s %s", applescript, a:force, shellescape(a:path, 1))
+    let s:opened_marked = 0
+  else
+    let applescript = s:applescript([
+      \ 'try',
+      \ '  close (first document whose path is equal to (item 1 of argv as string))',
+      \ 'end try',
+      \ ])
+
+    execute printf("silent !osascript %s %s", applescript, shellescape(a:path, 1))
+  endif
 endfunction
 
 function! s:MarkedQuitVimLeave() abort
-  if get(g:, "marked_autoquit", 1)
+  if get(g:, "marked_autoquit", 1) && s:opened_marked
     call s:MarkedQuit(1, "")
   endif
 endfunction
@@ -69,18 +69,7 @@ function! s:MarkedPreview(line1, line2) abort
 endfunction
 
 function! s:is_document_open(path) abort
-  let applescript = s:applescript([
-    \ 'on run argv',
-    \ '  if application "Marked 2" is running then',
-    \ '    tell application "Marked 2"',
-    \ '      set docs to path of every document',
-    \ '      if docs contains (item 1 of argv as string) then',
-    \ '        "1"',
-    \ '      end if',
-    \ '    end tell',
-    \ '  end if',
-    \ 'end run',
-    \ ])
+  let applescript = s:applescript(['if (path of every document) contains (item 1 of argv as string) then "1"'])
 
   let cmd = printf("osascript %s %s", applescript, shellescape(a:path, 1))
 
@@ -106,7 +95,21 @@ function! s:url_encode(str) abort
 endfunction
 
 function! s:applescript(lines) abort
-  return join(map(a:lines, "'-e ' . shellescape(v:val, 1)"), " ")
+  let lines = [
+    \ 'on run argv',
+    \ '  if application "Marked 2" is running then',
+    \ '    tell application "Marked 2"',
+    \ ]
+
+  let lines += a:lines
+
+  let lines += [
+    \ '    end tell',
+    \ '  end if',
+    \ 'end run',
+    \ ]
+
+  return join(map(lines, "'-e ' . shellescape(v:val, 1)"), " ")
 endfunction
 
 augroup marked_commands
