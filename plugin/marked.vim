@@ -33,7 +33,15 @@ let s:opened_marked = 0
 
 let g:marked_filetypes = get(g:, "marked_filetypes", ["markdown", "mkd", "ghmarkdown", "vimwiki"])
 
-function! s:marked_open_uri(background, command, args) abort
+function! s:DetermineStrategy() abort
+  if get(g:, "marked_app", "Marked 2") ==? "Marked 2"
+    return "modern"
+  else
+    return "legacy"
+  endif
+endfunction
+
+function! s:MarkedOpenModern(background, command, args) abort
   let uri = "x-marked://" . a:command
 
   if !empty(a:args)
@@ -45,8 +53,22 @@ function! s:marked_open_uri(background, command, args) abort
   let s:opened_marked = 1
 endfunction
 
+function! s:MarkedOpenLegacy(background, path) abort
+  execute printf("silent !open %s -a %s %s",
+    \ (a:background ? "-g" : ""),
+    \ shellescape(g:marked_app, 1),
+    \ shellescape(a:path, 1)
+    \ )
+
+  let s:opened_marked = 1
+endfunction
+
 function! s:MarkedOpen(background, path) abort
-  call s:marked_open_uri(a:background, "open", { "file": a:path })
+  if s:DetermineStrategy() == "modern"
+    call s:MarkedOpenModern(a:background, "open", { "file": a:path })
+  else
+    call s:MarkedOpenLegacy(a:background, a:path)
+  endif
 endfunction
 
 function! s:MarkedQuit(force, path) abort
@@ -60,6 +82,7 @@ function! s:MarkedQuit(force, path) abort
       \ '  close (first document whose path is equal to (item 1 of argv as string))',
       \ 'end try',
       \ ], a:path)
+    let s:opened_marked = 0
   endif
 endfunction
 
@@ -70,7 +93,7 @@ function! s:MarkedQuitVimLeave() abort
 endfunction
 
 function! s:MarkedToggle(background_or_force_quit, path) abort
-  if s:is_document_open(a:path)
+  if s:DocumentIsOpen(a:path)
     call s:MarkedQuit(a:background_or_force_quit, a:path)
   else
     call s:MarkedOpen(a:background_or_force_quit, a:path)
@@ -78,12 +101,24 @@ function! s:MarkedToggle(background_or_force_quit, path) abort
 endfunction
 
 function! s:MarkedPreview(background, line1, line2) abort
-  let text = join(getline(a:line1, a:line2), "\n")
+  let lines = getline(a:line1, a:line2)
 
-  call s:marked_open_uri(a:background, "preview", { "text": text })
+  if s:DetermineStrategy() == "modern"
+    call s:MarkedOpenModern(a:background, "preview", { "text": join(lines, "\n") })
+  else
+    call s:MarkedOpenLegacy(a:background, s:WriteTempFile(lines))
+  endif
 endfunction
 
-function! s:is_document_open(path) abort
+function! s:WriteTempFile(lines) abort
+  let temp_file = printf("%s-%s", tempname(), "tmp-" . fnamemodify(expand("%"), ":t"))
+
+  call writefile(a:lines, temp_file)
+
+  return temp_file
+endfunction
+
+function! s:DocumentIsOpen(path) abort
   let result = s:applescript('if (path of every document) contains (item 1 of argv as string) then "1"', a:path)
 
   return result == "1"
@@ -112,10 +147,12 @@ function! s:url_encode(str) abort
 endfunction
 
 function! s:applescript(raw, ...) abort
+  let app = get(g:, "marked_app", "Marked 2")
+
   let lines = [
     \ 'on run argv',
-    \ '  if application "Marked 2" is running then',
-    \ '    tell application "Marked 2"',
+    \ '  if application "' . app . '" is running then',
+    \ '    tell application "' . app . '"',
     \ ]
 
   let lines += type(a:raw) == type([]) ? a:raw : [a:raw]

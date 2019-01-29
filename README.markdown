@@ -1,11 +1,11 @@
 # marked.vim
 
-Vim plugin for [Marked 2](http://marked2app.com), a previewer for Markdown
-files.
+Vim plugin for [Marked](http://marked2app.com), a previewer for Markdown
+files. Supports Marked 1 and 2.
 
 Adds `:MarkedOpen`, `:MarkedQuit`, `:MarkedToggle`, and `:MarkedPreview`
 commands to Markdown buffers, allowing you to quickly open, close, and preview
-content in Marked 2.
+content in Marked.
 
 **Note**: Since Marked is available only for macOS, this plugin will is not
 loaded under other operating systems.
@@ -44,6 +44,15 @@ Send the current range (defaults to the enture buffer) to Marked as a preview.
 Call with a bang to prevent Marked from stealing focus from Vim.
 
 ## Configuration
+
+**`g:marked_app`**
+
+The Marked application name. By default this is "Marked 2". If you are still
+using Marked.app version 1, add the following to your `vimrc`:
+
+```
+let g:marked_app = "Marked"
+```
 
 **`g:marked_filetypes`**
 
