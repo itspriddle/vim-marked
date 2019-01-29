@@ -36,9 +36,10 @@ with a bang to quit Marked completely.
 If the current Markdown file is already open in Marked, same as
 `:MarkedQuit[!]`. If not, same as `:MarkedOpen[!]`.
 
-:[range]MarkedPreview                          *marked-:MarkedPreview*
+:[range]MarkedPreview[!]                       *marked-:MarkedPreview*
 
 Send the current range (defaults to the enture buffer) to Marked as a preview.
+Call with a bang to prevent Marked from stealing focus from Vim.
 
 ==============================================================================
 CONFIGURATION                                   *marked-configuration*

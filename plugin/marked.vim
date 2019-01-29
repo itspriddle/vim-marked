@@ -79,10 +79,10 @@ function! s:MarkedToggle(background_or_force_quit, path) abort
   endif
 endfunction
 
-function! s:MarkedPreview(line1, line2) abort
+function! s:MarkedPreview(background, line1, line2) abort
   let text = join(getline(a:line1, a:line2), "\n")
 
-  call s:marked_open_uri(0, "preview", { "text": text })
+  call s:marked_open_uri(a:background, "preview", { "text": text })
 endfunction
 
 function! s:is_document_open(path) abort
@@ -103,10 +103,10 @@ function! s:FileTypeInit(filetype) abort
 endfunction
 
 function! MarkedSetup() abort
-  command! -buffer -bang    MarkedOpen    call s:MarkedOpen(<bang>0, expand("%:p"))
-  command! -buffer -bang    MarkedQuit    call s:MarkedQuit(<bang>0, expand("%:p"))
-  command! -buffer -bang    MarkedToggle  call s:MarkedToggle(<bang>0, expand("%:p"))
-  command! -buffer -range=% MarkedPreview call s:MarkedPreview(<line1>, <line2>)
+  command! -buffer -bang          MarkedOpen    call s:MarkedOpen(<bang>0, expand("%:p"))
+  command! -buffer -bang          MarkedQuit    call s:MarkedQuit(<bang>0, expand("%:p"))
+  command! -buffer -bang          MarkedToggle  call s:MarkedToggle(<bang>0, expand("%:p"))
+  command! -buffer -bang -range=% MarkedPreview call s:MarkedPreview(<bang>0, <line1>, <line2>)
 endfunction
 
 " From the legend
