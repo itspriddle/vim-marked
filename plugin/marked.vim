@@ -51,17 +51,15 @@ endfunction
 
 function! s:MarkedQuit(force, path) abort
   if a:force
-    execute printf("silent !osascript %s", s:applescript(["quit"]))
+    call s:applescript("quit")
 
     let s:opened_marked = 0
   else
-    let applescript = s:applescript([
+    call s:applescript([
       \ 'try',
       \ '  close (first document whose path is equal to (item 1 of argv as string))',
       \ 'end try',
-      \ ])
-
-    execute printf("silent !osascript %s %s", applescript, shellescape(a:path, 1))
+      \ ], a:path)
   endif
 endfunction
 
@@ -86,11 +84,9 @@ function! s:MarkedPreview(background, line1, line2) abort
 endfunction
 
 function! s:is_document_open(path) abort
-  let applescript = s:applescript(['if (path of every document) contains (item 1 of argv as string) then "1"'])
+  let result = s:applescript('if (path of every document) contains (item 1 of argv as string) then "1"', a:path)
 
-  let cmd = printf("osascript %s %s", applescript, shellescape(a:path, 1))
-
-  return trim(system(cmd)) == "1"
+  return result == "1"
 endfunction
 
 function! s:FileTypeInit(filetype) abort
@@ -115,14 +111,14 @@ function! s:url_encode(str) abort
   return substitute(iconv(a:str, "latin1", "utf-8"), "[^A-Za-z0-9_.~-]", '\="%".printf("%02X", char2nr(submatch(0)))', "g")
 endfunction
 
-function! s:applescript(lines) abort
+function! s:applescript(raw, ...) abort
   let lines = [
     \ 'on run argv',
     \ '  if application "Marked 2" is running then',
     \ '    tell application "Marked 2"',
     \ ]
 
-  let lines += a:lines
+  let lines += type(a:raw) == type([]) ? a:raw : [a:raw]
 
   let lines += [
     \ '    end tell',
@@ -130,7 +126,13 @@ function! s:applescript(lines) abort
     \ 'end run',
     \ ]
 
-  return join(map(lines, "'-e ' . shellescape(v:val, 1)"), " ")
+  let applescript = join(map(lines, "'-e ' . shellescape(v:val, 1)"), " ")
+
+  let args = join(map(copy(a:000), "shellescape(v:val, 1)"), " ")
+
+  silent let output = system(printf("osascript %s %s", applescript, args))
+
+  return trim(output)
 endfunction
 
 augroup marked_commands
