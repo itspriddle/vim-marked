@@ -62,6 +62,16 @@ following to your `vimrc`:
 let g:marked_autoquit = 0
 ```
 
+**`MarkedSetup()`**
+
+Vim function to initialize this plugin. Useful for cases where you want to
+work with Marked based on a specific filename. For example, to activate the
+plugin for `LICENSE` files, add the following to your `vimrc`:
+
+```
+autocmd BufNewFile,BufRead LICENSE call MarkedSetup()
+```
+
 ## License
 
 MIT License - see [`LICENSE`](./LICENSE) in this repo.

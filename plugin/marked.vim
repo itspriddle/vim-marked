@@ -4,13 +4,30 @@
 " Version: 2.0.0-beta
 " License: Same as Vim itself (see :help license)
 
-if &cp || (exists("g:marked_loaded") && g:marked_loaded) || !has("macunix") || !executable("osascript")
+if &cp || (exists("g:marked_loaded") && g:marked_loaded)
   finish
 endif
 
 let g:marked_loaded = 1
 let s:save_cpo = &cpo
 set cpo&vim
+
+function! s:warn(message) abort
+  echohl WarningMsg
+  echo "marked.vim " . a:message
+  echohl None
+endfunction
+
+if !has("macunix") || !executable("osascript")
+  function! MarkedSetup()
+    call s:warn("skipped initialization on non-macOS operating system")
+  endfunction
+
+  let &cpo = s:save_cpo
+  unlet s:save_cpo
+
+  finish
+endif
 
 let s:opened_marked = 0
 
@@ -76,16 +93,20 @@ function! s:is_document_open(path) abort
   return trim(system(cmd)) == "1"
 endfunction
 
-function! s:init(filetype) abort
+function! s:FileTypeInit(filetype) abort
   if index(g:marked_filetypes, a:filetype) >= 0
-    command! -buffer -bang    MarkedOpen    call s:MarkedOpen(<bang>0, expand("%:p"))
-    command! -buffer -bang    MarkedQuit    call s:MarkedQuit(<bang>0, expand("%:p"))
-    command! -buffer -bang    MarkedToggle  call s:MarkedToggle(<bang>0, expand("%:p"))
-    command! -buffer -range=% MarkedPreview call s:MarkedPreview(<line1>, <line2>)
+    call MarkedSetup()
 
     let b:undo_ftplugin = get(b:, "undo_ftplugin", "exe") .
       \ "| delc MarkedOpen | delc MarkedQuit | delc MarkedToggle | delc MarkedPreview"
   endif
+endfunction
+
+function! MarkedSetup() abort
+  command! -buffer -bang    MarkedOpen    call s:MarkedOpen(<bang>0, expand("%:p"))
+  command! -buffer -bang    MarkedQuit    call s:MarkedQuit(<bang>0, expand("%:p"))
+  command! -buffer -bang    MarkedToggle  call s:MarkedToggle(<bang>0, expand("%:p"))
+  command! -buffer -range=% MarkedPreview call s:MarkedPreview(<line1>, <line2>)
 endfunction
 
 " From the legend
@@ -114,7 +135,7 @@ endfunction
 
 augroup marked_commands
   autocmd!
-  autocmd FileType    * call s:init(expand("<amatch>"))
+  autocmd FileType    * call s:FileTypeInit(expand("<amatch>"))
   autocmd VimLeavePre * call s:MarkedQuitVimLeave()
 augroup END
 
