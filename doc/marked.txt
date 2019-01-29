@@ -1,55 +1,87 @@
-*marked.vim*  Open the current Markdown buffer in Marked.app.
-
+*marked.txt*  Open Markdown in Marked.
 Author: Joshua Priddle <jpriddle@me.com>
-License: Same terms as Vim itself (see |license|)
+License: MIT (see |marked-license|)
+Version: 2.0.0
+
+This plugin is only available on macOS and if 'compatible' is not set.
 
 ==============================================================================
 INTRODUCTION                                    *marked*
 
-marked.vim adds `:MarkedOpen`, `:MarkedQuit` and `:MarkedToggle` commands to
-Markdown buffers.
+Vim plugin for Marked (http://marked2app.com), a previewer for Markdown files.
+Supports Marked 1 and 2.
 
-Note: Since Marked is available only for OS X, this plugin will not be loaded
-unless you are on OS X.
+Adds `:MarkedOpen`, `:MarkedQuit`, `:MarkedToggle`, and `:MarkedPreview`
+commands to Markdown buffers, allowing you to quickly open, close, and preview
+content in Marked.
+
+==============================================================================
+COMMANDS                                        *marked-commands*
+
+This plugin adds the following commands to Markdown buffers (see
+|g:marked_filetypes| to add more |FileTypes|):
+
+:MarkedOpen[!]                                  *marked-:MarkedOpen*
+
+Open the current Markdown file in Marked. Call with a bang to prevent Marked
+from stealing focus from Vim.
+
+:MarkedQuit[!]                                  *marked-:MarkedQuit*
+
+Close the Marked document corresponding to the current Markdown file. Call
+with a bang to quit Marked completely.
+
+:MarkedToggle[!]                                *marked-:MarkedToggle*
+
+If the current Markdown file is already open in Marked, same as
+`:MarkedQuit[!]`. If not, same as `:MarkedOpen[!]`.
+
+:[range]MarkedPreview[!]                       *marked-:MarkedPreview*
+
+Send the current range (defaults to the enture buffer) to Marked as a preview.
+Call with a bang to prevent Marked from stealing focus from Vim.
 
 ==============================================================================
 CONFIGURATION                                   *marked-configuration*
 
-                                                *g:marked_app*
+*g:marked_filetypes*
+
 The Marked application name. By default this is "Marked 2". If you are still
 using Marked.app version 1, add the following to your |vimrc|: >
-    let g:marked_app = 'Marked'
+    let g:marked_app = "Marked"
 <
-                                                *g:marked_filetypes*
-Vim FileTypes that can be opened by Marked. If you need to customize, update
-the list in your |vimrc|: >
+*g:marked_filetypes*
+
+Vim FileTypes that can be opened by Marked and will load this plugin. The
+default is as follows and can be customized in your |vimrc| if necessary: >
     let g:marked_filetypes = ["markdown", "mkd", "ghmarkdown", "vimwiki"]
 <
-==============================================================================
-COMMANDS                                        *marked-commands*
+*g:marked_autoquit*
 
-                                                *marked-:MarkedOpen*
-:MarkedOpen[!]          Open the current Markdown buffer in Marked. Call with
-                        a bang to prevent Marked from stealing focus from Vim.
-                        Documents opened in Marked are tracked and closed
-                        automatically when you quit Vim.
+If true, quit Marked when Vim exits. Default is true. To disable, add the
+following to your |vimrc|: >
+    let g:marked_autoquit = 0
+<
+*MarkedSetup()*
 
-                                                *marked-:MarkedQuit*
-:MarkedQuit             Close the current Markdown buffer in Marked. Quits
-                        Marked if there are no other documents open.
-
-                                                *marked-:MarkedToggle*
-:MarkedToggle[!]        If the current Markdown buffer is already open in
-                        Marked, same as :MarkedQuit. If not, same as
-                        :MarkedOpen[!].
-
-
+Vim function to initialize this plugin. Useful for cases where you want to
+work with Marked based on a specific filename. For example, to activate the
+plugin for `LICENSE` files, add the following to your |vimrc|: >
+    autocmd BufNewFile,BufRead LICENSE call MarkedSetup()
+<
 ==============================================================================
 ABOUT                                           *marked-about*
 
 Grab the latest version or report a bug on Github:
 
 https://github.com/itspriddle/vim-marked
+
+==============================================================================
+LICENSE                                         *marked-license*
+
+MIT License
+
+https://github.com/itspriddle/vim-marked/blob/master/LICENSE
 
 ==============================================================================
  vim:tw=78:et:ft=help:norl:
