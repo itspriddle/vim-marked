@@ -37,7 +37,7 @@ function! s:OpenMarked(background)
 
   call s:AddDocument(l:filename)
 
-  silent exe "!open -a '".g:marked_app."' ".(a:background ? '-g' : '')." '".l:filename."'"
+  silent call system("open -a '".g:marked_app."' ".(a:background ? '-g' : '')." '".l:filename."'")
   redraw!
 endfunction
 
