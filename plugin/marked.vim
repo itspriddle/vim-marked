@@ -116,10 +116,12 @@ function! s:MarkedToggle(background_or_force_quit, path)
   endif
 endfunction
 
-function! s:QuitAll()
-  for document in s:open_documents
-    call s:MarkedQuit(0, document)
-  endfor
+function! s:MarkedQuitVimLeave() abort
+  if get(g:, "marked_auto_quit", 1)
+    for document in s:open_documents
+      call s:MarkedQuit(0, document)
+    endfor
+  endif
 endfunction
 
 function! s:RegisterCommands(filetype) abort
@@ -136,7 +138,7 @@ endfunction
 
 augroup marked_commands
   autocmd!
-  autocmd VimLeavePre * call s:QuitAll()
+  autocmd VimLeavePre * call s:MarkedQuitVimLeave()
   autocmd FileType * call s:RegisterCommands(expand("<amatch>"))
 augroup END
 

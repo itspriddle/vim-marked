@@ -54,6 +54,15 @@ default is as follows and can be customized in your `vimrc` if necessary:
 let g:marked_filetypes = ["markdown", "mkd", "ghmarkdown", "vimwiki"]
 ```
 
+**`g:marked_auto_quit`**
+
+If true, quit Marked when Vim exits. Default is true. To disable, add the
+following to your `vimrc`:
+
+```
+let g:marked_auto_quit = 0
+```
+
 **`g:marked_app`**
 
 The Marked application name. By default this is "Marked 2". If your app
