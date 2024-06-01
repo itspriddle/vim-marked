@@ -66,6 +66,12 @@ function! s:MarkedQuit(path)
   redraw!
 endfunction
 
+function! s:MarkedPreview(background, line1, line2) abort
+  let lines = getline(a:line1, a:line2)
+
+  call s:MarkedOpenURI(a:background, "preview", { "text": join(lines, "\n") })
+endfunction
+
 function! s:RunApplescript(raw, ...) abort
   let app = get(g:, "marked_app", "Marked 2")
 
@@ -114,12 +120,13 @@ endfunction
 
 function! s:RegisterCommands(filetype) abort
   if index(g:marked_filetypes, a:filetype) >= 0
-    command! -buffer -bang MarkedOpen   call s:MarkedOpen(<bang>0)
-    command! -buffer       MarkedQuit   call s:MarkedQuit(expand('%:p'))
-    command! -buffer -bang MarkedToggle call s:MarkedToggle(<bang>0, expand('%:p'))
+    command! -buffer -bang          MarkedOpen    call s:MarkedOpen(<bang>0)
+    command! -buffer                MarkedQuit    call s:MarkedQuit(expand('%:p'))
+    command! -buffer -bang          MarkedToggle  call s:MarkedToggle(<bang>0, expand('%:p'))
+    command! -buffer -bang -range=% MarkedPreview call s:MarkedPreview(<bang>0, <line1>, <line2>)
 
     let b:undo_ftplugin = get(b:, "undo_ftplugin", "exe") .
-      \ "| delc MarkedOpen | delc MarkedQuit | delc MarkedToggle"
+      \ "| delc MarkedOpen | delc MarkedQuit | delc MarkedToggle | delc MarkedPreview"
   endif
 endfunction
 
