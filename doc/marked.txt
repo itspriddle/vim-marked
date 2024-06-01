@@ -43,6 +43,11 @@ COMMANDS                                        *marked-commands*
                         Marked, same as :MarkedQuit. If not, same as
                         :MarkedOpen[!].
 
+                                                *marked-:MarkedPreview*
+:[range]MarkedPreview[!] Send the current range (defaults to the entire
+                         buffer) to Marked as a preview. Call with a bang to
+                         prevent Marked from stealing focus from Vim.
+
 
 ==============================================================================
 ABOUT                                           *marked-about*

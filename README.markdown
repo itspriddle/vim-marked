@@ -33,6 +33,10 @@ This plugin adds the following commands to Markdown buffers:
                             Marked, calls :MarkedQuit. If not, calls
                             :MarkedOpen[!].
 
+    :[range]MarkedPreview[!] Send the current range (defaults to the entire
+                             buffer) to Marked as a preview. Call with a bang to
+                             prevent Marked from stealing focus from Vim.
+
 ## License
 
 MIT License - see [`LICENSE`](./LICENSE) in this repo.
