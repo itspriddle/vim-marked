@@ -23,11 +23,11 @@ from stealing focus from Vim. Documents opened in Marked are tracked and
 closed automatically when you quit Vim.
 
 ```
-:MarkedQuit
+:MarkedQuit[!]
 ```
 
 Close the current Markdown buffer in Marked. Quits Marked if there are no
-other documents open.
+other documents open. Call with a bang to quit Marked completely.
 
 ```
 :MarkedToggle[!]
