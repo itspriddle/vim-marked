@@ -51,17 +51,21 @@ function! s:MarkedOpen(background)
   redraw!
 endfunction
 
-function! s:MarkedQuit(path)
+function! s:MarkedQuit(force, path)
   call s:RemoveDocument(a:path)
 
-  call s:RunApplescript([
-    \ 'try',
-    \ '  close (first document whose path is equal to (item 1 of argv as string))',
-    \ '  if count of documents is equal to 0 then',
-    \ '    quit',
-    \ '  end if',
-    \ 'end try',
-    \ ], a:path)
+  if a:force
+    call s:RunApplescript("quit")
+  else
+    call s:RunApplescript([
+      \ 'try',
+      \ '  close (first document whose path is equal to (item 1 of argv as string))',
+      \ '  if count of documents is equal to 0 then',
+      \ '    quit',
+      \ '  end if',
+      \ 'end try',
+      \ ], a:path)
+  endif
 
   redraw!
 endfunction
@@ -104,24 +108,24 @@ function! s:url_encode(str) abort
   return substitute(iconv(a:str, "latin1", "utf-8"), "[^A-Za-z0-9_.~-]", '\="%".printf("%02X", char2nr(submatch(0)))', "g")
 endfunction
 
-function! s:MarkedToggle(background, path)
+function! s:MarkedToggle(background_or_force_quit, path)
   if index(s:open_documents, a:path) < 0
-    call s:MarkedOpen(a:background)
+    call s:MarkedOpen(a:background_or_force_quit)
   else
-    call s:MarkedQuit(a:path)
+    call s:MarkedQuit(a:background_or_force_quit, a:path)
   endif
 endfunction
 
 function! s:QuitAll()
   for document in s:open_documents
-    call s:MarkedQuit(document)
+    call s:MarkedQuit(0, document)
   endfor
 endfunction
 
 function! s:RegisterCommands(filetype) abort
   if index(g:marked_filetypes, a:filetype) >= 0
     command! -buffer -bang          MarkedOpen    call s:MarkedOpen(<bang>0)
-    command! -buffer                MarkedQuit    call s:MarkedQuit(expand('%:p'))
+    command! -buffer -bang          MarkedQuit    call s:MarkedQuit(<bang>0, expand('%:p'))
     command! -buffer -bang          MarkedToggle  call s:MarkedToggle(<bang>0, expand('%:p'))
     command! -buffer -bang -range=% MarkedPreview call s:MarkedPreview(<bang>0, <line1>, <line2>)
 
