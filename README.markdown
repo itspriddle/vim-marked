@@ -35,4 +35,4 @@ This plugin adds the following commands to Markdown buffers:
 
 ## License
 
-Same as Vim itself, see `:help license`.
+MIT License - see [`LICENSE`](./LICENSE) in this repo.
