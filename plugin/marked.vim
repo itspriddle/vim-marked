@@ -18,13 +18,13 @@ let g:marked_filetypes = get(g:, "marked_filetypes", ["markdown", "mkd", "ghmark
 
 let s:open_documents = []
 
-function! s:AddDocument(path)
+function! s:AddDocument(path) abort
   if index(s:open_documents, a:path) < 0
     call add(s:open_documents, a:path)
   endif
 endfunction
 
-function! s:RemoveDocument(path)
+function! s:RemoveDocument(path) abort
   let index = index(s:open_documents, a:path)
 
   if index >= 0
@@ -42,7 +42,7 @@ function! s:MarkedOpenURI(background, command, args) abort
   execute printf("silent !open %s %s", (a:background ? "-g" : ""), shellescape(uri, 1))
 endfunction
 
-function! s:MarkedOpen(background)
+function! s:MarkedOpen(background) abort
   let l:filename = expand("%:p")
 
   call s:AddDocument(l:filename)
@@ -51,7 +51,7 @@ function! s:MarkedOpen(background)
   redraw!
 endfunction
 
-function! s:MarkedQuit(force, path)
+function! s:MarkedQuit(force, path) abort
   call s:RemoveDocument(a:path)
 
   if a:force
@@ -108,7 +108,7 @@ function! s:url_encode(str) abort
   return substitute(iconv(a:str, "latin1", "utf-8"), "[^A-Za-z0-9_.~-]", '\="%".printf("%02X", char2nr(submatch(0)))', "g")
 endfunction
 
-function! s:MarkedToggle(background_or_force_quit, path)
+function! s:MarkedToggle(background_or_force_quit, path) abort
   if index(s:open_documents, a:path) < 0
     call s:MarkedOpen(a:background_or_force_quit)
   else
