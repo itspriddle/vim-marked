@@ -32,12 +32,22 @@ function! s:RemoveDocument(path)
   endif
 endfunction
 
+function! s:OpenMarkedURI(background, command, args) abort
+  let uri = "x-marked://" . a:command
+
+  if !empty(a:args)
+    let uri .= "?" . join(map(items(a:args), 'printf("%s=%s", v:val[0], s:url_encode(v:val[1]))'), "&")
+  endif
+
+  execute printf("silent !open %s %s", (a:background ? "-g" : ""), shellescape(uri, 1))
+endfunction
+
 function! s:OpenMarked(background)
   let l:filename = expand("%:p")
 
   call s:AddDocument(l:filename)
 
-  silent exe "!open -a '".g:marked_app."' ".(a:background ? '-g' : '')." '".l:filename."'"
+  call s:OpenMarkedURI(a:background, "open", {"file": l:filename})
   redraw!
 endfunction
 
@@ -80,6 +90,12 @@ function! s:applescript(raw, ...) abort
   silent let output = system(printf("osascript %s %s", applescript, args))
 
   return trim(output)
+endfunction
+
+" From the legend
+" https://github.com/tpope/vim-unimpaired/blob/5694455/plugin/unimpaired.vim#L369-L372
+function! s:url_encode(str) abort
+  return substitute(iconv(a:str, "latin1", "utf-8"), "[^A-Za-z0-9_.~-]", '\="%".printf("%02X", char2nr(submatch(0)))', "g")
 endfunction
 
 function! s:ToggleMarked(background, path)
