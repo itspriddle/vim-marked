@@ -44,19 +44,42 @@ endfunction
 function! s:QuitMarked(path)
   call s:RemoveDocument(a:path)
 
-  let cmd  = " -e 'try'"
-  let cmd .= " -e 'if application \"".g:marked_app."\" is running then'"
-  let cmd .= " -e 'tell application \"".g:marked_app."\"'"
-  let cmd .= " -e 'close (first document whose path is equal to \"".a:path."\")'"
-  let cmd .= " -e 'if count of documents is equal to 0 then'"
-  let cmd .= " -e 'quit'"
-  let cmd .= " -e 'end if'"
-  let cmd .= " -e 'end tell'"
-  let cmd .= " -e 'end if'"
-  let cmd .= " -e 'end try'"
+  call s:applescript([
+    \ 'try',
+    \ '  close (first document whose path is equal to (item 1 of argv as string))',
+    \ '  if count of documents is equal to 0 then',
+    \ '    quit',
+    \ '  end if',
+    \ 'end try',
+    \ ], a:path)
 
-  silent exe "!osascript ".cmd
   redraw!
+endfunction
+
+function! s:applescript(raw, ...) abort
+  let app = get(g:, "marked_app", "Marked 2")
+
+  let lines = [
+    \ 'on run argv',
+    \ '  if application "' . app . '" is running then',
+    \ '    tell application "' . app . '"',
+    \ ]
+
+  let lines += type(a:raw) == type([]) ? a:raw : [a:raw]
+
+  let lines += [
+    \ '    end tell',
+    \ '  end if',
+    \ 'end run',
+    \ ]
+
+  let applescript = join(map(lines, "'-e ' . shellescape(v:val, 1)"), " ")
+
+  let args = join(map(copy(a:000), "shellescape(v:val, 1)"), " ")
+
+  silent let output = system(printf("osascript %s %s", applescript, args))
+
+  return trim(output)
 endfunction
 
 function! s:ToggleMarked(background, path)
