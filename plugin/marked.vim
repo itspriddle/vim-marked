@@ -32,7 +32,7 @@ function! s:RemoveDocument(path)
   endif
 endfunction
 
-function! s:OpenMarkedURI(background, command, args) abort
+function! s:MarkedOpenURI(background, command, args) abort
   let uri = "x-marked://" . a:command
 
   if !empty(a:args)
@@ -42,19 +42,19 @@ function! s:OpenMarkedURI(background, command, args) abort
   execute printf("silent !open %s %s", (a:background ? "-g" : ""), shellescape(uri, 1))
 endfunction
 
-function! s:OpenMarked(background)
+function! s:MarkedOpen(background)
   let l:filename = expand("%:p")
 
   call s:AddDocument(l:filename)
 
-  call s:OpenMarkedURI(a:background, "open", {"file": l:filename})
+  call s:MarkedOpenURI(a:background, "open", {"file": l:filename})
   redraw!
 endfunction
 
-function! s:QuitMarked(path)
+function! s:MarkedQuit(path)
   call s:RemoveDocument(a:path)
 
-  call s:applescript([
+  call s:RunApplescript([
     \ 'try',
     \ '  close (first document whose path is equal to (item 1 of argv as string))',
     \ '  if count of documents is equal to 0 then',
@@ -66,7 +66,7 @@ function! s:QuitMarked(path)
   redraw!
 endfunction
 
-function! s:applescript(raw, ...) abort
+function! s:RunApplescript(raw, ...) abort
   let app = get(g:, "marked_app", "Marked 2")
 
   let lines = [
@@ -98,25 +98,25 @@ function! s:url_encode(str) abort
   return substitute(iconv(a:str, "latin1", "utf-8"), "[^A-Za-z0-9_.~-]", '\="%".printf("%02X", char2nr(submatch(0)))', "g")
 endfunction
 
-function! s:ToggleMarked(background, path)
+function! s:MarkedToggle(background, path)
   if index(s:open_documents, a:path) < 0
-    call s:OpenMarked(a:background)
+    call s:MarkedOpen(a:background)
   else
-    call s:QuitMarked(a:path)
+    call s:MarkedQuit(a:path)
   endif
 endfunction
 
 function! s:QuitAll()
   for document in s:open_documents
-    call s:QuitMarked(document)
+    call s:MarkedQuit(document)
   endfor
 endfunction
 
 function! s:RegisterCommands(filetype) abort
   if index(g:marked_filetypes, a:filetype) >= 0
-    command! -buffer -bang MarkedOpen   call s:OpenMarked(<bang>0)
-    command! -buffer       MarkedQuit   call s:QuitMarked(expand('%:p'))
-    command! -buffer -bang MarkedToggle call s:ToggleMarked(<bang>0, expand('%:p'))
+    command! -buffer -bang MarkedOpen   call s:MarkedOpen(<bang>0)
+    command! -buffer       MarkedQuit   call s:MarkedQuit(expand('%:p'))
+    command! -buffer -bang MarkedToggle call s:MarkedToggle(<bang>0, expand('%:p'))
 
     let b:undo_ftplugin = get(b:, "undo_ftplugin", "exe") .
       \ "| delc MarkedOpen | delc MarkedQuit | delc MarkedToggle"
