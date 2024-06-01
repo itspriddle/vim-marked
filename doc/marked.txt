@@ -1,7 +1,7 @@
 *marked.vim*  Open the current Markdown buffer in Marked.app.
 
 Author: Joshua Priddle <jpriddle@me.com>
-License: Same terms as Vim itself (see |license|)
+License: MIT (see |marked-license|)
 
 ==============================================================================
 INTRODUCTION                                    *marked*
@@ -50,6 +50,13 @@ ABOUT                                           *marked-about*
 Grab the latest version or report a bug on Github:
 
 https://github.com/itspriddle/vim-marked
+
+==============================================================================
+LICENSE                                         *marked-license*
+
+MIT License
+
+https://github.com/itspriddle/vim-marked/blob/master/LICENSE
 
 ==============================================================================
  vim:tw=78:et:ft=help:norl:
