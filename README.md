@@ -65,12 +65,7 @@ let g:marked_app = "Marked"
 ```
 
 Note that this plugin requires Marked 2. If you are still using Marked 1, you
-can use the 1.0.0 release of this plugin (see below).
-
-## Marked 1
-
-If you are using the older first version of Marked, you can use v1.0.0 of this
-plugin from <https://github.com/itspriddle/vim-marked/releases/tag/v1.0.0>.
+can use the 1.0.0 release of this plugin (see [below](#marked-1)).
 
 ## Installation
 
@@ -87,6 +82,26 @@ Or using vim's built-in package manager:
 mkdir -p ~/.vim/pack/itspriddle/start
 cd ~/.vim/pack/itspriddle/start
 git clone https://github.com/itspriddle/vim-marked.git
+vim -u NONE -c "helptags vim-marked/doc" -c q
+```
+
+### Marked 1
+
+If you are using the older first version of Marked, you can use v1.0.0 of this
+plugin from <https://github.com/itspriddle/vim-marked/releases/tag/v1.0.0>.
+
+For vim-plug:
+
+```vim
+Plug 'itspriddle/vim-marked', { 'tag': 'v1.0.0' }
+```
+
+Or using vim's built-in package manager:
+
+```sh
+mkdir -p ~/.vim/pack/itspriddle/start
+cd ~/.vim/pack/itspriddle/start
+git clone --branch v1.0.0 https://github.com/itspriddle/vim-marked.git
 vim -u NONE -c "helptags vim-marked/doc" -c q
 ```
 
