@@ -57,11 +57,12 @@ let g:marked_auto_quit = 0
 
 **`g:marked_app`**
 
-The Marked application name. By default this is "Marked 2". If your app
-identifies itself differently, you can set this variable in your `vimrc`:
+The Marked application name. By default this is "Marked 2". If your version of
+Marked 2 doesn't open with `open -a "Marked 2"`, you can specify a different
+name or path to the application.
 
 ```vim
-let g:marked_app = "Marked"
+let g:marked_app = "/Applications/Setapp/Marked 2.app"
 ```
 
 Note that this plugin requires Marked 2. If you are still using Marked 1, you
