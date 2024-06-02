@@ -14,31 +14,23 @@ loaded on other operating systems.
 This plugin adds the following commands to Markdown buffers (see
 `g:marked_filetypes` below to add more FileTypes):
 
-```
-:MarkedOpen[!]
-```
+#### :MarkedOpen[!]
 
 Open the current Markdown file in Marked. Call with a bang to prevent Marked
 from stealing focus from Vim. Documents opened in Marked are tracked and
 closed automatically when you quit Vim.
 
-```
-:MarkedQuit[!]
-```
+#### :MarkedQuit[!]
 
 Close the current Markdown buffer in Marked. Quits Marked if there are no
 other documents open. Call with a bang to quit Marked completely.
 
-```
-:MarkedToggle[!]
-```
+#### :MarkedToggle[!]
 
 If the current Markdown file is already open in Marked, same as
 `:MarkedQuit[!]`. If not, same as `:MarkedOpen[!]`.
 
-```
-:[range]MarkedPreview[!]
-```
+#### :[range]MarkedPreview[!]
 
 Send the current range (defaults to the entire buffer) to Marked as a preview.
 Call with a bang to prevent Marked from stealing focus from Vim.
@@ -50,7 +42,7 @@ Call with a bang to prevent Marked from stealing focus from Vim.
 Vim FileTypes that can be opened by Marked and will load this plugin. The
 default is as follows and can be customized in your `vimrc` if necessary:
 
-```
+```vim
 let g:marked_filetypes = ["markdown", "mkd", "ghmarkdown", "vimwiki"]
 ```
 
@@ -59,7 +51,7 @@ let g:marked_filetypes = ["markdown", "mkd", "ghmarkdown", "vimwiki"]
 If true, quit Marked when Vim exits. Default is true. To disable, add the
 following to your `vimrc`:
 
-```
+```vim
 let g:marked_auto_quit = 0
 ```
 
@@ -68,7 +60,7 @@ let g:marked_auto_quit = 0
 The Marked application name. By default this is "Marked 2". If your app
 identifies itself differently, you can set this variable in your `vimrc`:
 
-```
+```vim
 let g:marked_app = "Marked"
 ```
 
