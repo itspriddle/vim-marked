@@ -72,6 +72,24 @@ can use the 1.0.0 release of this plugin (see below).
 If you are using the older first version of Marked, you can use v1.0.0 of this
 plugin from <https://github.com/itspriddle/vim-marked/releases/tag/v1.0.0>.
 
+## Installation
+
+Use your favorite plugin manager to install this plugin. For example, using
+[vim-plug](https://github.com/junegunn/vim-plug):
+
+```vim
+Plug 'itspriddle/vim-marked'
+```
+
+Or using vim's built-in package manager:
+
+```sh
+mkdir -p ~/.vim/pack/itspriddle/start
+cd ~/.vim/pack/itspriddle/start
+git clone https://github.com/itspriddle/vim-marked.git
+vim -u NONE -c "helptags vim-marked/doc" -c q
+```
+
 ## License
 
 MIT License - see [`LICENSE`](./LICENSE) in this repo.
