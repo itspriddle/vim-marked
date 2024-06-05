@@ -4,8 +4,8 @@
 " Version: 2.0.0-beta
 " License: Same as Vim itself (see :help license)
 
-" Don't do anything if we're not on OS X.
-if &cp || (exists("g:marked_loaded") && g:marked_loaded) || !has('unix') || system('uname -s') != "Darwin\n"
+" Don't do anything if we're not on macOS.
+if &cp || (exists("g:marked_loaded") && g:marked_loaded) || !executable("osascript")
   finish
 endif
 
