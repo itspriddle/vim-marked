@@ -52,11 +52,11 @@ function! s:MarkedOpen(background) abort
 endfunction
 
 function! s:MarkedQuit(force, path) abort
-  call s:RemoveDocument(a:path)
-
   if a:force
+    let s:open_documents = []
     call s:RunApplescript("quit")
   else
+    call s:RemoveDocument(a:path)
     call s:RunApplescript("closeDocument", a:path)
   endif
 
