@@ -25,11 +25,7 @@ function! s:AddDocument(path) abort
 endfunction
 
 function! s:RemoveDocument(path) abort
-  let index = index(s:open_documents, a:path)
-
-  if index >= 0
-    unlet s:open_documents[index]
-  endif
+  unlet! s:open_documents[index(s:open_documents, a:path)]
 endfunction
 
 function! s:MarkedOpenURI(background, command, args) abort
