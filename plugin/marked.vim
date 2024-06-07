@@ -57,14 +57,7 @@ function! s:MarkedQuit(force, path) abort
   if a:force
     call s:RunApplescript("quit")
   else
-    call s:RunApplescript([
-      \ 'try',
-      \ '  close (first document whose path is equal to (item 1 of argv as string))',
-      \ '  if count of documents is equal to 0 then',
-      \ '    quit',
-      \ '  end if',
-      \ 'end try',
-      \ ], a:path)
+    call s:RunApplescript("closeDocument", a:path)
   endif
 
   redraw!
@@ -76,30 +69,37 @@ function! s:MarkedPreview(background, line1, line2) abort
   call s:MarkedOpenURI(a:background, "preview", { "text": join(lines, "\n") })
 endfunction
 
-function! s:RunApplescript(raw, ...) abort
+let s:js =<< trim JS
+  function run(argv) {
+    let appId = argv[0], action = argv[1], path = argv[2];
+
+    try {
+      var app = Application(appId);
+    } catch (e) {
+      return `error:Couldn't find Marked 2 application.`;
+    }
+
+    if (!app.running()) return;
+
+    if (action == "quit") {
+      app.quit();
+    } else if (action == "closeDocument") {
+      let doc = app.documents().find((d) => d.path() == path)
+
+      if (doc) {
+        doc.close();
+        if (app.documents().length == 0) app.quit();
+      }
+    }
+  }
+JS
+
+function! s:RunApplescript(...) abort
   let app = get(g:, "marked_app", "Marked 2")
 
-  let lines = [
-    \ 'on run argv',
-    \ '  if application "' . app . '" is running then',
-    \ '    tell application "' . app . '"',
-    \ ]
+  let args = join(map([app] + copy(a:000), "shellescape(v:val, 1)"), " ")
 
-  let lines += type(a:raw) == type([]) ? a:raw : [a:raw]
-
-  let lines += [
-    \ '    end tell',
-    \ '  end if',
-    \ 'end run',
-    \ ]
-
-  let applescript = join(map(lines, "'-e ' . shellescape(v:val, 1)"), " ")
-
-  let args = join(map(copy(a:000), "shellescape(v:val, 1)"), " ")
-
-  silent let output = system(printf("osascript %s %s", applescript, args))
-
-  return trim(output)
+  silent return trim(system("osascript -l JavaScript - " . args, s:js))
 endfunction
 
 " From the legend
