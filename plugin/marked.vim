@@ -2,7 +2,7 @@
 " Author:  Joshua Priddle <jpriddle@me.com>
 " URL:     https://github.com/itspriddle/vim-marked
 " Version: 2.0.0-beta
-" License: Same as Vim itself (see :help license)
+" License: MIT
 
 " Don't do anything if we're not on macOS.
 if &cp || (exists("g:marked_loaded") && g:marked_loaded) || !executable("osascript")
