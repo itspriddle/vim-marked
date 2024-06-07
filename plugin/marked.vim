@@ -42,12 +42,10 @@ function! s:MarkedOpenURI(background, command, args) abort
   execute printf("silent !open %s %s", (a:background ? "-g" : ""), shellescape(uri, 1))
 endfunction
 
-function! s:MarkedOpen(background) abort
-  let l:filename = expand("%:p")
+function! s:MarkedOpen(background, path) abort
+  call s:AddDocument(a:path)
+  call s:MarkedOpenURI(a:background, "open", { "file": a:path })
 
-  call s:AddDocument(l:filename)
-
-  call s:MarkedOpenURI(a:background, "open", {"file": l:filename})
   redraw!
 endfunction
 
@@ -110,7 +108,7 @@ endfunction
 
 function! s:MarkedToggle(background_or_force_quit, path) abort
   if index(s:open_documents, a:path) < 0
-    call s:MarkedOpen(a:background_or_force_quit)
+    call s:MarkedOpen(a:background_or_force_quit, a:path)
   else
     call s:MarkedQuit(a:background_or_force_quit, a:path)
   endif
@@ -126,7 +124,7 @@ endfunction
 
 function! s:RegisterCommands(filetype) abort
   if index(g:marked_filetypes, a:filetype) >= 0
-    command! -buffer -bang          MarkedOpen    call s:MarkedOpen(<bang>0)
+    command! -buffer -bang          MarkedOpen    call s:MarkedOpen(<bang>0, expand('%:p'))
     command! -buffer -bang          MarkedQuit    call s:MarkedQuit(<bang>0, expand('%:p'))
     command! -buffer -bang          MarkedToggle  call s:MarkedToggle(<bang>0, expand('%:p'))
     command! -buffer -bang -range=% MarkedPreview call s:MarkedPreview(<bang>0, <line1>, <line2>)
