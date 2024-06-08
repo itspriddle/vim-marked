@@ -66,6 +66,10 @@ function! s:MarkedQuit(force, path) abort
 endfunction
 
 function! s:MarkedPreview(background, line1, line2) abort
+  if s:MarkedVersionCheck() == 0
+    return
+  endif
+
   let lines = getline(a:line1, a:line2)
 
   call s:MarkedOpenURI(a:background, "preview", { "text": join(lines, "\n") })
