@@ -65,7 +65,9 @@ name or path to the application in your |vimrc|: >
     let g:marked_app = "/Applications/Setapp/Marked 2.app"
 <
 Note that this plugin requires Marked 2. If you are still using Marked 1, you
-can use the 1.0.0 release of this plugin (see |marked-about|).
+can use the 1.0.0 release of this plugin (see |marked-about|). If you still
+have *g:marked_app* set to "Marked", you should update it to "Marked 2" or
+remove it from your |vimrc|.
 
 ==============================================================================
 ABOUT                                           *marked-about*

@@ -39,6 +39,10 @@ function! s:MarkedOpenURI(background, command, args) abort
 endfunction
 
 function! s:MarkedOpen(background, path) abort
+  if s:MarkedVersionCheck() == 0
+    return
+  endif
+
   call s:AddDocument(a:path)
   call s:MarkedOpenURI(a:background, "open", { "file": a:path })
 
@@ -46,6 +50,10 @@ function! s:MarkedOpen(background, path) abort
 endfunction
 
 function! s:MarkedQuit(force, path) abort
+  if s:MarkedVersionCheck() == 0
+    return
+  endif
+
   if a:force
     let s:open_documents = []
     call s:RunApplescript("quit")
@@ -72,6 +80,8 @@ let s:js =<< trim JS
     } catch (e) {
       return `error:Couldn't find Marked 2 application.`;
     }
+
+    if (action == "version") return app.version();
 
     if (!app.running()) return;
 
@@ -116,6 +126,26 @@ function! s:MarkedQuitVimLeave() abort
       call s:MarkedQuit(0, document)
     endfor
   endif
+endfunction
+
+function! s:MarkedVersionCheck() abort
+  if !exists("s:marked_version")
+    let s:marked_version = s:RunApplescript("version")
+  endif
+
+  if s:marked_version =~ "^1"
+    echohl WarningMsg
+    echomsg "marked.vim requires Marked 2 but you've configured it to use Marked 1."
+    echomsg "See `:help g:marked_app` for more information."
+    echohl None
+  elseif s:marked_version !~ "^2"
+    echohl WarningMsg
+    echomsg "This plugin requires Marked 2."
+    echomsg "Visit https://marked2app.com to download it."
+    echohl None
+  end
+
+  return s:marked_version =~ "^2"
 endfunction
 
 function! s:RegisterCommands(filetype) abort
